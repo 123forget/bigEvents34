@@ -59,47 +59,18 @@
     <script src="./js/bootstrap/js/bootstrap.min.js"></script>
     <script>
         $(function () {
-            //给登录按钮设置一个点击事件,取消默认跳转
-            $('.input_sub').on('click', function (e) {
+            $('.input_sub').on('click',function(e){
                 e.preventDefault();
-                //获取用户输入的账号和密码
-                var userName = $('.input_txt').val().trim();
-                var password = $('.input_pass').val().trim();
-                //做一个非空判断,如果为空,弹框提示一下,如果不为空,继续
-                if (userName == "" || password == "") {
-                    //alert("账号或密码为空,请正确输入!");
-                    //设置弹出框的文本
-                    $('.modal-body').text("账号或密码为空,请正确输入!");
-                    //调用bs的方法,弹出模态框
-                    $('#myModal').modal({
-                        keyboard: true
-                    });
-                    return;
+                //找到账号输入框
+                var userNmae=$('.input_txt').val().trim();
+                //找到密码输入框
+                var password=$('.input_pass').val().trim();
+                
+                //判断输入框中的内容是否为空
+                if(userNmae==''||password==''){
+                    
                 }
-                //发送ajax请求,接受到数据接口返回的数据
-                $.ajax({
-                    type: 'post',
-                    url: 'https://autumnfish.cn/big/admin/login',
-                    data: {
-                        user_name: userName,
-                        password: password
-                    },
-                    success: function (backData) {
-                        //console.log(backData);
-                        //判断
-                        if (backData.code != 200) {
-                            //alert("账号密码错误,请重新输入!");
-                            //设置弹出框的文本
-                            $('.modal-body').text("账号密码错误,请重新输入!");
-                            $('#myModal').modal({
-                                keyboard: true
-                            });
-                        } else {
-                            //账号密码正确,就应该登录成功,跳转到后台管理首页.
-                            window.location.href = './index.html';
-                        }
-                    }
-                });
+                }); 
             });
 
             /*
