@@ -36,9 +36,12 @@
         $(function () {
             $('.input_sub').on('click', function (e) {
                 e.preventDefault();
+                //获取用户输入的账户信息
+                var userNmae = $('.input_txt').val().trim();
+                //获取用户输入的密码
+                var password = $('.input_pass').val().trim();
                 //判断输入框中的内容是否为空
                 if (userNmae == '' || password == '') {
-
                     $('.box').html('账号或密码不能为空，请重新输入！！');
                     return;
                 }
@@ -55,6 +58,7 @@
                         // confirm('123');
                         if (backData.code == 200) {
                             window.location.href = "index.html";
+                            $('.box').html('登录成功！！');
                         } else {
                             $('.box').html('账号或密码输入错误，请重新输入！！');
                         }
