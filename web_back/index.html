@@ -107,7 +107,10 @@
         function resizeFrame() {
             var frame_w = $('#main_body').outerWidth();
             var frame_h = $('#main_body').outerHeight();
-            $('#main_frame').css({ 'width': frame_w, 'height': frame_h });
+            $('#main_frame').css({
+                'width': frame_w,
+                'height': frame_h
+            });
         }
 
         resizeFrame();
@@ -126,39 +129,31 @@
                 $('.level02').children().eq(n).addClass('active').siblings().removeClass('active');
             }
         }
-
     </script>
 
     <!-- 引入bs的js文件 -->
     <script src="./js/bootstrap/js/bootstrap.min.js"></script>
     <script>
         $(function () {
-            //给退出的a标签设置一个点击事件
+            //找到退出按钮，给退出按钮添加点击事件
             $('#btn_logout').on('click', function (e) {
                 e.preventDefault();
-                //发送ajax请求,得到数据
+                //发送ajax请求
                 $.ajax({
                     type: 'post',
                     url: 'https://autumnfish.cn/big/admin/logout',
                     success: function (backData) {
-                        //console.log(backData);
-                        //判断
+                        console.log(backData);
                         if (backData.code == 200) {
-                            //退出成功,跳转到登录页面
-                            window.location.href = './login.html';
+                            window.location.href = "login.html";
                         } else {
-                            // alert('退出失败');
-                            //调用bs的模态框的方法弹出模态框.
                             $('#myModal').modal({
-                                keyboard:true
-                            });
+                                keyboard: true
+                            })
                         }
                     }
                 });
             });
-
-
-            
             /*
             步骤:
             1.给退出的a标签设置一个点击事件.
