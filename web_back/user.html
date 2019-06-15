@@ -45,7 +45,8 @@
                     <label for="inputPassword3" class="col-sm-2 control-label ">用户图标：</label>
                     <div class="col-sm-10">
                         <img src="images/2.jpg" alt="" class="user_pic"><br>
-                      <label for="exampleInputFile"><img src="./images/Snipaste_2019-06-14_20-19-27.png" alt="" style=" width: 46px;height: 40px;"></label>
+                        <label for="exampleInputFile"><img src="./images/Snipaste_2019-06-14_20-19-27.png" alt=""
+                                style=" width: 46px;height: 40px;"></label>
                         <input type="file" style="opacity: 0;" id="exampleInputFile" name="user_pic">
                     </div>
                 </div>
@@ -109,14 +110,29 @@
                 $.ajax({
                     type: 'post',
                     url: 'http://localhost:8000/admin/userinfo_edit ',
-                    data:formdata,
+                    data: formdata,
                     //下面这句话是，不要给我设置请求头，因为我这里发送的数据使用的是formData，不需要
-                    contentType:false,
+                    contentType: false,
                     //下面这句话的意思是不要把我传递的参数转成key=value这种格式的字符串
-                    processData:false,
+                    processData: false,
                     success: function (backData) {
-                        console.log('修改成功！！');
-                        
+                        if (backData.code == 200) {
+                            console.log('修改成功！！');
+                            //当用户点击修改的时候重新渲染一遍页面，发送ajax请求
+                            $.ajax({
+                                type: 'get',
+                                url: "http://localhost:8000/admin/getuser",
+                                success: function (backData) {
+                                    console.log(backData);
+                                    //渲染左边
+                                    parent.$('.user_info span').html('欢迎&nbsp;&nbsp;' + backData.data.nickname);
+                                    parent.$('.user_info img').attr('src',backData.data.user_pic);
+                                    //渲染右边
+                                    parent.$('.user_center_link img').attr('src', backData.data.user_pic);
+                                }
+                            });
+                        }
+
                     }
                 });
             });
