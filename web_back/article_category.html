@@ -73,7 +73,7 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增分类</a>
+                            <a href="#" id='addCategory' class="btn btn-success" data-toggle="modal" data-target="#addModal">新增分类</a>
                         </td>
                     </tr>
                 </tfoot>
@@ -107,11 +107,11 @@
                         <input type="hidden" id="recipient-id" name="id">
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">分类名称:</label>
-                            <input type="text" class="form-control" id="recipient-name1">
+                            <input type="text" name="name" class="form-control" id="recipient-name1">
                         </div>
                         <div class="form-group">
                             <label for="message-text" class="control-label">分类别名:</label>
-                            <input type="text" class="form-control" id="recipient-name2">
+                            <input type="text" name="slug" class="form-control" id="recipient-name2">
                         </div>
                     </form>
                 </div>
@@ -139,12 +139,6 @@
             $('#addModal').modal('hide');
         });
 
-        // $('.category_table').delegate('a', 'click', function () {
-        //     if ($(this).hasClass('btn-info')) {
-        //         $('#addModal .modal-title').html('修改分类名称');
-        //         $('#addModal').modal('show');
-        //     }
-        // })
     </script>
 
     <script>
@@ -167,6 +161,29 @@
             $('#model_add').on('click', function () {
                 // 判断这个按钮有没有这个类，有就是保存
                 if ($(this).hasClass('btn-success')) {
+                    //获取用户修改之后的类型名称和类别别名
+                    // var endName=$('#recipient-name1').val();
+                    // var end2Name= $('#recipient-name2').val();
+                    // var endId= $('#recipient-id').val();
+                    var data1=$('form').serialize();
+
+                    //发送ajax请求
+                    $.ajax({
+                        type:'post',
+                        url:'http://localhost:8000/admin/category_edit',
+
+                        // data:{
+                        //     id:endId,
+                        //     name:endName,
+                        //     slug:end2Name
+                        // },
+                        data:data1,
+                        success:function(backData){
+                            // console.log(backData); 
+                            //修改成功后，重新渲染一下
+                            get();
+                        }
+                    });
 
                 } else {
                     //获取用户新增的分类名称
