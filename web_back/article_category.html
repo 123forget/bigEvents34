@@ -88,9 +88,8 @@
             <td>{{$value.name}}</td>
             <td>{{$value.slug}}</td>
             <td class="text-center">
-                <a href="javascript:editTr({&quot;id&quot;:&quot;3&quot;,&quot;slug&quot;:&quot;living&quot;,&quot;name&quot;:&quot;{{$value.name}}&quot;});"
-                    class="btn btn-info btn-xs">编辑</a>
-                <a href="javascript:deleteTr( {{$value.id}});" class="btn btn-danger btn-xs">删除</a>
+                <a href="javascript:void(0);" data-id="{{$value.id}}" class="btn btn-info btn-xs btn-editor" >编辑</a>
+                <a href="javascript:void(0);" data-id="{{$value.id}}" class="btn btn-danger btn-xs deleted-id">删除</a>
             </td>
         </tr>
         {{/each}}
@@ -105,6 +104,7 @@
                 </div>
                 <div class="modal-body">
                     <form>
+                        <input type="hidden" id="recipient-id" name="id">
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">分类名称:</label>
                             <input type="text" class="form-control" id="recipient-name1">
@@ -139,32 +139,30 @@
             $('#addModal').modal('hide');
         });
 
-        $('.category_table').delegate('a', 'click', function () {
-            if ($(this).hasClass('btn-info')) {
-                $('#addModal .modal-title').html('修改分类名称');
-                $('#addModal').modal('show');
-            }
-        })
+        // $('.category_table').delegate('a', 'click', function () {
+        //     if ($(this).hasClass('btn-info')) {
+        //         $('#addModal .modal-title').html('修改分类名称');
+        //         $('#addModal').modal('show');
+        //     }
+        // })
     </script>
 
     <script>
         $(function () {
-            get();
-
             function get() {
                 //发送ajax请求
                 $.ajax({
                     type: 'get',
                     url: 'http://localhost:8000/admin/category_search',
                     success: function (backData) {
-                        console.log(backData);
+                        // console.log(backData);
                         var reshtml = template('tem_table', backData);
                         $('tbody').html(reshtml);
                     }
                 });
             }
 
-
+            get();
             //给新增按钮添加点击事件
             $('#model_add').on('click', function () {
                 //获取用户新增的分类名称
@@ -189,6 +187,61 @@
                     }
                 });
                 $('#addModal').modal('hide');
+            });
+
+            //给删除按钮添加点击事件，委托方式注册
+            $('tbody').on('click', 'a.deleted-id', function () {
+
+                var that=$(this);
+                //获取a标签中的自定义属性，deleted-id
+                var id = $(this).attr('data-id');
+                console.log(id);
+                //发送ajax请求
+                $.ajax({
+                    type: "get",
+                    url: 'http://localhost:8000/admin/article_delete',
+                    data: {
+                        id: id
+                    },
+                    success: function (backData) {
+                        console.log(backData);
+                        if (backData.code == 200) {
+                            // get();
+                            //找到父节点击删除直接移除tr
+                            that.parent().parent().remove();
+                        }
+                    }
+                });
+
+            });
+
+            //给编辑按钮添加注册事件，委托方式注册
+            $('tbody').on('click','a.btn-editor',function(){
+                //获取当前鼠标点击的位置索引
+                var id=$(this).attr('data-id');
+                //获取表格中名称和slug中的值
+                var name=$(this).parent().prev().prev().text();
+                var slug=$(this).parent().prev().text();
+
+                //获取弹出来的模态框的id赋值给input标签
+                $('#recipient-name1').val(name);
+                $('#recipient-name2').val(slug);
+                $('#recipient-id').val(id);
+
+                $('#addModal .modal-title').html('修改分类名称');
+                $('#model_add').text('保存').addClass('btn-success');
+                $('#addModal').modal('show');
+
+            });
+
+            //点击新增分类按钮，弹出模态框里的样式/名字还原
+            $('#addCategory').on('click',function(){
+                $('#recipient-name1').val('');
+                $('#recipient-name2').val("");
+                $('#recipient-id').val("");
+
+                $('#addModal .modal-title').html('新增分类');
+                $('#model_add').text('新增').removeClass('btn-success');
             });
         });
     </script>
