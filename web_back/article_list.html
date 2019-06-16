@@ -24,7 +24,7 @@
                 <div class="col-xs-6">
                     <form class="form-inline">
                         <select id="selCategory" name="" class="form-control input-sm">
-                            <option>所有分类</option>
+                            <option value="">所有分类</option>
                             <option>未分类</option>
                             <option>奇趣事</option>
                             <option>会生活</option>
@@ -276,6 +276,7 @@
         {{/each}}
     </script>
 
+    <!-- 文章筛选分类模板引擎 -->
     <script id="tmp_list" type="text/html">
         {{each data v}}
         <tr>
@@ -342,6 +343,8 @@
             });
 
         });
+        //页面一进来就搜索全部
+        $('#btnSearch').trigger('click');
     </script>
 
 </body>
