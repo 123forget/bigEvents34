@@ -15,6 +15,7 @@
     <script src="js/jedate/js/jedate.js"></script>
     <script src="js/tinymce/js/tinymce/tinymce.min.js"></script>
     <script src="js/tinymce/js/tinymce_setup.js"></script>
+    <script src="./js/template-web.js"></script>
 </head>
 
 <body>
@@ -27,20 +28,20 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章标题：</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="inputEmail3" placeholder="文章标题">
+                        <input type="text" name='title' class="form-control" id="inputEmail3" placeholder="文章标题">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
-                        <img src="" alt="" style="height: 100px;">
-                        <input type="file" id="exampleInputFile">
+                        <img src="" alt="" style="height: 100px;"><br>
+                        <input name="cover" type="file"  id="exampleInputFile">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章类别：</label>
                     <div class="col-sm-4">
-                        <select class="form-control">
+                        <select  name='type' class="form-control">
                             <option>1</option>
                             <option>2</option>
                             <option>3</option>
@@ -54,7 +55,7 @@
                     <div class="col-sm-4">
 
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="YYYY-MM-DD" id="dateinput">
+                            <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD" id="dateinput">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="button"
                                     onclick="jeDate('#dateinput',{trigger:false,format: 'YYYY-MM-DD'})"><i
@@ -73,20 +74,64 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">发布</button>
+                        <button type="submit" class="btn btn-success btn-faBu">发布</button>
                         <button type="submit" class="btn btn-default">存为草稿</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-
+    <!-- 创建文章类别模板引擎 -->
+    <script id="temp_ope" type="text/html">
+        {{each data v}}
+        <option value='{{v.id}}'>{{v.name}}</option>
+        {{/each}}
+    </script>
     <script>
-        //本地图片上功能完成
-        $('#exampleInputFile').on('click',function(){
-            var icon=this.files[0];
-            var url=URL.createObjectURL(icon);
-            $('img').setAttribute('src',url);
+        $(function () {
+            //图片预览模块
+            $('#exampleInputFile').on('change', function () {
+                var icon = this.files[0];
+                var url = URL.createObjectURL(icon);
+                $(this).prev().prev().attr('src', url);
+            });
+
+            //图片一进入写文章中的文章类别里面，就发送ajax请求
+            //发送ajax请求
+            $.ajax({
+                type: 'get',
+                url: 'http://localhost:8000/admin/category_search',
+                success: function (backData) {
+                    // console.log(backData);
+
+                    //通过模板引擎的方法，渲染到页面上
+                    //调用模板引擎
+                    var reshtml = template('temp_ope', backData);
+                    $('.form-control').html(reshtml);
+                }
+            });
+        });
+
+        //点击发布按钮发送ajax请求
+        $('.btn-faBu').on('click', function (e) {
+            //阻止form表单跳转
+            e.preventDefault();
+            //创建formeData对象
+            var formdata1 = new FormData($('form')[0]);
+            formdata1.append('content', tinyMCE.activeEditor.getContent());
+            formdata1.append('state', '草稿');
+            //发送ajax请求
+            $.ajax({
+                type: 'post',
+                data:formdata1,
+                url: 'http://localhost:8000/admin/article_publish',
+                contentType: false,
+                processData: false,
+                success: function (backData) {
+                    console.log(backData);
+
+                }
+            });
         });
     </script>
 
