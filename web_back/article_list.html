@@ -288,7 +288,7 @@
             <td class="text-center">{{v.state}}</td>
             <td class="text-center">
                 <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
-                <a href="javascript:viod(0)" data-id="{{v.id}}" class="btn btn-danger btn-xs">删除</a>
+                <a href="javascript:void(0)" data-id="{{v.id}}" class="btn btn-danger btn-xs btn-sc">删除</a>
             </td>
         </tr>
         {{/each}}
@@ -300,22 +300,29 @@
             window.parent.setMenu(1, 1);
         });
 
+
         //一进到文章列表里面，就要加载文章列表中所有的内容
+        getPost();
+        function getPost() {
+           
+            //发送ajax请求
+            $.ajax({
+                type: 'get',
+                url: 'http://localhost:8000/admin/category_search',
+                success: function (backData) {
+                    // console.log(backData);
+                    //通过模板引擎的方法调用渲染到页面
+                    if (backData.code == 200) {
+                        var reshtml = template('temp', backData);
+                        $('#selCategory').html(reshtml);
+                    }
 
-        //发送ajax请求
-        $.ajax({
-            type: 'get',
-            url: 'http://localhost:8000/admin/category_search',
-            success: function (backData) {
-                // console.log(backData);
-                //通过模板引擎的方法调用渲染到页面
-                if (backData.code == 200) {
-                    var reshtml = template('temp', backData);
-                    $('#selCategory').html(reshtml);
                 }
+            });
+        }
 
-            }
-        });
+
+
 
         var mytotalPage = 10;
 
@@ -390,6 +397,31 @@
             e.preventDefault();
             getArticle(1);
         });
+
+        //给删除按钮添加点击事件
+
+        $('tbody').on('click', 'a.btn-sc', function (e) {
+            e.preventDefault();
+            var that = $(this);
+            //获取到删除按的id
+            var id = $(this).attr('data-id');
+            console.log(id);
+
+            // 发送ajax请求，删除文章
+            $.ajax({
+                type: 'get',
+                url: 'http://localhost:8000/admin/article_delete',
+                data: {
+                    id: id
+                },
+                success: function (backData) {
+                    console.log(backData);
+                    that.parent().parent().remove();
+                    getPost();
+                }
+            });
+        });
+
         //页面一进来就搜索全部
         $('#btnSearch').trigger('click');
     </script>
