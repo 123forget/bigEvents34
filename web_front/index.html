@@ -230,7 +230,7 @@
             {{else}}
         <li>
             {{/if}}
-            <a href="#"><img src="{{v.cover}}" alt=""></a>
+            <a href="./article.html?id={{v.id}}"><img src="{{v.cover}}" alt=""></a>
             <p>{{v.title}}</p>
         </li>
         {{/each}}
@@ -254,6 +254,7 @@
                     //调用模板引擎
                     var resHtml=template('temp_list',backData);
                     $('.focus_list').html(resHtml);
+                    
                 }
             });
         });
