@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/main.css">
     <script src="js/jquery-1.12.4.min.js"></script>
     <script src="./js/template-web.js"></script>
+    <script src="./js/jquery.twbsPagination.js"></script>
 </head>
 
 <body>
@@ -270,7 +271,7 @@
     </div>
     <!-- 文章所有分类模板引擎 -->
     <script id="temp" type="text/html">
-        <option>所有分类</option>
+        <option value=''>所有分类</option>
         {{each data v}}
         <option value='{{v.id}}'>{{v.name}}</option>
         {{/each}}
@@ -284,7 +285,7 @@
             <td>{{v.author}}</td>
             <td>{{v.type}}</td>
             <td class="text-center">{{v.date}}</td>
-            <td class="text-center">{{v.date}}</td>
+            <td class="text-center">{{v.state}}</td>
             <td class="text-center">
                 <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
                 <a href="javascript:viod(0)" data-id="{{v.id}}" class="btn btn-danger btn-xs">删除</a>
@@ -316,11 +317,34 @@
             }
         });
 
-        //给筛选按钮添加点击事件
-        $('#btnSearch').on('click', function (e) {
-            e.preventDefault();
-            var type=$('#selCategory').val();
-            var state=$('#selStatus').val();
+        var mytotalPage = 10;
+
+        //使用动态获取总页数，的分页插件的方法
+        var $pagination = $('.pagination');
+        var defaultOpts = {
+            totalPages: mytotalPage,
+            visiblePages: 7,
+            first: '首页',
+            last: '尾页',
+            next: '下一页',
+            prev: '上一页',
+            //onPageClick:点击的页码触发的事件
+            onPageClick: function (event, page) {
+                // console.log(event);//点击的事件
+                // console.log(page);//点击的页码
+                //掉用筛选方法
+                getArticle(page);
+            }
+        };
+        $pagination.twbsPagination(defaultOpts);
+
+
+
+        //把筛选按钮封装成函数
+        function getArticle(mypage) {
+
+            var type = $('#selCategory').val();
+            var state = $('#selStatus').val();
             //发送ajax请求
             $.ajax({
                 type: 'get',
@@ -329,19 +353,42 @@
                     key: '',
                     type: type,
                     state: state,
-                    page: 1,
+                    page: mypage,
                     perpage: 5,
                 },
                 success: function (backData) {
-                    if(backData.code==200){
+                    if (backData.code == 200) {
                         console.log(backData);
-                        var reshtml=template('tmp_list',backData);
-                        $('tbody').html(reshtml);
-                    }                
+                        var resHtml = template('tmp_list', backData);
+                        $('tbody').html(resHtml);
 
+                        var totalPages = backData.totalPage;
+
+                        if (mytotalPage != totalPages) {
+                            mytotalPage = totalPages;
+
+                            var currentPage = 1; //当前页
+
+
+
+                            $pagination.twbsPagination('destroy');
+                            $pagination.twbsPagination($.extend({}, defaultOpts, {
+                                startPage: currentPage,
+                                totalPages: totalPages
+                            }));
+                        }
+                    }
                 }
             });
 
+        }
+
+
+
+        //给筛选按钮添加点击事件
+        $('#btnSearch').on('click', function (e) {
+            e.preventDefault();
+            getArticle(1);
         });
         //页面一进来就搜索全部
         $('#btnSearch').trigger('click');
